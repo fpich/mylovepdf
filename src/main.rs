@@ -65,6 +65,11 @@ enum Commands {
         #[arg(long, default_value_t = 150)]
         dpi: u32,
     },
+    /// Ouvrir un PDF dans Xournal++ pour l'annoter
+    Edit {
+        /// Fichier PDF d'entrée
+        input: PathBuf,
+    },
 }
 
 fn main() {
@@ -83,6 +88,7 @@ fn main() {
             output_dir,
             dpi,
         } => commands::pdf_to_jpg(&input, &output_dir, dpi),
+        Commands::Edit { input } => commands::edit(&input),
     };
 
     if let Err(e) = result {

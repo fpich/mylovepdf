@@ -9,6 +9,7 @@ Binaire PDF tout-en-un en ligne de commande, façon iLovePDF, écrit en Rust.
 3. **Fusionner** plusieurs PDF en un seul
 4. **Convertir** des images JPG/PNG en PDF
 5. **Convertir** un PDF en images JPG
+6. **Éditer** un PDF dans Xournal++ (annotation)
 
 ## Compilation
 
@@ -59,6 +60,14 @@ mylovepdf pdf-to-jpg document.pdf -o images/ --dpi 150
 ```
 
 `--dpi` contrôle la résolution de sortie (défaut 150).
+
+### Éditer un PDF dans Xournal++
+
+```bash
+mylovepdf edit document.pdf
+```
+
+Ouvre le PDF dans [Xournal++](https://xournalpp.github.io/) pour l'annoter. Nécessite que `xournalpp` soit installé et disponible dans le `PATH`.
 
 ## Aide
 

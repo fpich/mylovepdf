@@ -290,3 +290,19 @@ pub fn pdf_to_jpg(input: &Path, output_dir: &Path, dpi: u32) -> Result<(), Strin
     println!("{} pages rendues dans {}", page_count, output_dir.display());
     Ok(())
 }
+
+pub fn edit(input: &Path) -> Result<(), String> {
+    if !input.exists() {
+        return Err(format!("{} : fichier introuvable", input.display()));
+    }
+
+    let status = std::process::Command::new("xournalpp")
+        .arg(input)
+        .status()
+        .map_err(|e| format!("lancement de xournalpp : {e}"))?;
+
+    if !status.success() {
+        return Err(format!("xournalpp s'est terminé avec le code {:?}", status.code()));
+    }
+    Ok(())
+}
