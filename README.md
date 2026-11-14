@@ -67,7 +67,7 @@ mylovepdf pdf-to-jpg document.pdf -o images/ --dpi 150
 mylovepdf edit document.pdf
 ```
 
-Ouvre le PDF dans [Xournal++](https://xournalpp.github.io/) pour l'annoter. Nécessite que `xournalpp` soit installé et disponible dans le `PATH`.
+Ouvre le PDF dans [Xournal++](https://xournalpp.github.io/) pour l'annoter. Si `xournalpp` n'est pas installé, la commande le détecte et propose de l'installer via le gestionnaire de paquets du système (apt, dnf, pacman, etc.).
 
 ## Aide
 

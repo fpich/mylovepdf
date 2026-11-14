@@ -296,6 +296,47 @@ pub fn edit(input: &Path) -> Result<(), String> {
         return Err(format!("{} : fichier introuvable", input.display()));
     }
 
+    // Vérifie que xournalpp est installé.
+    let available = std::process::Command::new("xournalpp")
+        .arg("--version")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok();
+
+    if !available {
+        println!("xournalpp n'est pas installé.");
+        if let Some(cmd) = install_command() {
+            println!("Pour l'installer : {cmd}");
+            print!("Voulez-vous l'installer maintenant ? [y/N] ");
+            use std::io::Write;
+            std::io::stdout().flush().map_err(|e| e.to_string())?;
+            let mut answer = String::new();
+            std::io::stdin()
+                .read_line(&mut answer)
+                .map_err(|e| e.to_string())?;
+            if answer.trim().eq_ignore_ascii_case("y") {
+                let status = std::process::Command::new("sh")
+                    .arg("-c")
+                    .arg(&cmd)
+                    .status()
+                    .map_err(|e| format!("lancement de l'installation : {e}"))?;
+                if !status.success() {
+                    return Err(format!(
+                        "l'installation a échoué (code {:?}). Installez xournalpp manuellement.",
+                        status.code()
+                    ));
+                }
+            } else {
+                return Err("Installation annulée. Installez xournalpp puis réessayez.".into());
+            }
+        } else {
+            return Err(
+                "Gestionnaire de paquets non reconnu. Installez xournalpp manuellement.".into(),
+            );
+        }
+    }
+
     let status = std::process::Command::new("xournalpp")
         .arg(input)
         .status()
@@ -305,4 +346,28 @@ pub fn edit(input: &Path) -> Result<(), String> {
         return Err(format!("xournalpp s'est terminé avec le code {:?}", status.code()));
     }
     Ok(())
+}
+
+/// Retourne la commande d'installation de xournalpp selon le gestionnaire de paquets détecté.
+fn install_command() -> Option<String> {
+    let candidates: &[(&str, &str)] = &[
+        ("apt-get", "sudo apt-get install -y xournalpp"),
+        ("dnf", "sudo dnf install -y xournalpp"),
+        ("yum", "sudo yum install -y xournalpp"),
+        ("pacman", "sudo pacman -S --noconfirm xournalpp"),
+        ("zypper", "sudo zypper install -y xournalpp"),
+        ("brew", "brew install --cask xournal"),
+    ];
+    for (bin, cmd) in candidates {
+        if std::process::Command::new(bin)
+            .arg("--version")
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .is_ok()
+        {
+            return Some((*cmd).to_string());
+        }
+    }
+    None
 }
